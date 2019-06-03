@@ -1,0 +1,82 @@
+---
+title: "autoencoder"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+data <- read.csv("house_new_data.csv")
+```
+
+```{r}
+data2 <- data[,35:79]
+data3 <- as.matrix(data2)
+dim(data3)
+```
+
+
+```{r}
+PCA <-prcomp(data2, rank. = 5, scale. = TRUE)
+PCA_final <- as.data.frame(PCA$x)
+PCA_final <- sapply(PCA_final, scale)
+```
+
+
+```{r}
+final <- as.data.frame(PCA_final)
+
+names(final) <- c("PCA1", "PCA2","PCA3","PCA4","PCA5")
+
+# write.csv(final, "final.csv")
+
+```
+
+
+```{r}
+install.packages("h2o")
+library(h2o)
+xnames <- colnames(final)
+h2o.init(nthreads = -1)
+
+# convert data to H2OFrame
+final_hf <- as.h2o(final)
+
+response <- "Class"
+features <- setdiff(colnames(final_hf), response)
+
+model_nn2 <- h2o.deeplearning(x = features,
+                             training_frame = final_hf,
+                             model_id = "model_nn",
+                             autoencoder = TRUE,
+                             reproducible = FALSE, #slow - turn off for real problems
+                             ignore_const_cols = FALSE,
+                             seed = 42,
+                             hidden = c(7, 2, 7), 
+                             epochs = 50,
+                             activation = "Tanh")
+
+
+# h2o.saveModel(model_nn2, path="model_nn2", force = TRUE)
+
+summary(model_nn2)
+
+
+#Convert to autoencoded representation
+test_autoenc2 <- h2o.predict(model_nn2, final_hf)
+
+auto_result <- h2o.predict(model_nn2, final_hf) %>% as.data.frame() 
+
+combine <- cbind(final, auto_result)
+
+combine2 <- combine %>% 
+   mutate(score = sqrt((combine$PCA1-combine$reconstr_PCA1)^2+(combine$PCA1-combine$reconstr_PCA2)^2+(combine$PCA3-combine$reconstr_PCA3)^2+(combine$PCA4-combine$reconstr_PCA4)^2+(combine$PCA5-combine$reconstr_PCA5)^2)) %>%
+   mutate(RECORD = 1:1070994) %>%
+   arrange(desc(score)) %>%
+   mutate(RANK = 1:1070994)
+
+# write.csv(combine2, "final_autoencoder_result.csv")
+options(scipen=200)
+ggplot(combine2, aes(x=score)) + geom_histogram() + scale_y_log10() 
+
+```
+

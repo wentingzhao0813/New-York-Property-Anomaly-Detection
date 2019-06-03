@@ -1,0 +1,30 @@
+---
+title: "combine score"
+author: "HUI"
+date: "4/27/2019"
+output: html_document
+---
+
+First, run pca.Rmd and autoencoder.Rmd 
+We can get z-score from data frame zscore and autoencoder score from data frame combine2
+Join those two data frames and calculate the mean of those two scores and get the final score.
+
+```{r}
+library(readr)
+combine2 <- read_csv("final_autoencoder_result.csv")
+```
+
+```{r}
+score_final <- left_join(zscore,combine2,by='RECORD')%>%
+  mutate(score=(rank+RANK)/2)%>%
+  select(11,12,24,23)%>%
+  arrange(score)
+
+names(score_final)[2]<-c("z_score_rank")
+names(score_final)[3]<-c("autoencoder_rank")
+
+write.csv(score_final, "score_final.csv")
+
+```
+
+

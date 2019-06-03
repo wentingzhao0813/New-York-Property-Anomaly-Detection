@@ -1,0 +1,53 @@
+---
+title: "PCA"
+author: "Qianru Zhou"
+date: "4/26/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+```{r}
+data <- read_csv("house_new_data.csv")[, 35:79]
+```
+
+```{r}
+# # z score each column
+# data2 <- data %>%
+#   map(function(x) (x - mean(x))/sd(x)) %>%
+#   as.data.frame(.)
+```
+
+```{r}
+PCA <- prcomp(data, rank. = 5, center=T, scale. = T)
+screeplot(PCA)
+summary(PCA)
+```
+```{r}
+#PCA$rotation
+```
+
+```{r}
+# express each record in PCs
+data3 <- as.data.frame(PCA$x) %>%
+  # z score again
+  map(function(x) (x - mean(x))/sd(x)) %>%
+  as.data.frame(.)
+```
+
+```{r}
+zscore <-data3 %>%
+  mutate(sum = rowSums(abs(.)), squared = PC1^2 + PC2^2 + PC3^2 + PC4^2 + PC5^2, sqrt = squared^0.5, max = pmax(PC1,PC2,PC3,PC4,PC5),  min = pmin(PC1,PC2,PC3,PC4,PC5)) %>%
+  mutate(RECORD = seq(1, nrow(data),1)) %>%
+  arrange(desc(sqrt)) %>%
+  mutate(rank = seq(1, nrow(data),1))
+
+# distribution plot
+options(scipen=200)
+ggplot(zscore, aes(x=sqrt)) + geom_histogram() + scale_y_log10() + xlim(0,500)
+```
+
+

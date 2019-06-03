@@ -1,0 +1,258 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+house <- read.csv("cleaned_data.csv")
+
+
+```
+
+```{r}
+sapply(house, function(x) sum(is.na(x)))
+```
+
+```{r}
+s1 <- house$LTFRONT * house$LTDEPTH
+s2 <- house$BLDFRONT * house$BLDDEPTH
+s3 <- s2 * house$STORIES
+
+```
+
+
+```{r}
+library(dplyr)
+V1 <- house$FULLVAL
+V2 <- house$AVLAND
+V3 <- house$AVTOT
+house$r1 <- V1/s1
+house$r2 <- V1/s2
+house$r3 <- V1/s3
+house$r4 <- V2/s1
+house$r5 <- V2/s2
+house$r6 <- V2/s3
+house$r7 <- V3/s1
+house$r8 <- V3/s2
+house$r9 <- V3/s3
+house$ZIP5 <- as.factor(strtrim(house$ZIP, 5))
+house$ZIP3 <- as.factor(strtrim(house$ZIP, 3))
+
+```
+
+r1 related
+```{r}
+house <- house%>%group_by(ZIP5)%>%
+  mutate(average = mean(r1))%>%
+  mutate(val_lft_zip5 = r1/average)
+
+house <- house%>%group_by(ZIP3)%>%
+  mutate(average = mean(r1))%>%
+  mutate(val_lft_zip3 = r1/average)
+
+house <- house%>%group_by(TAXCLASS)%>%
+  mutate(average = mean(r1))%>%
+  mutate(val_lft__taxclass = r1/average)
+
+house <- house%>%group_by(B)%>%
+  mutate(average = mean(r1))%>%
+  mutate(val_lft__borough = r1/average)
+
+house <- house%>%
+  mutate(val_lft__all = r1/mean(r1))
+
+
+```
+
+r2 related
+```{r}
+house <- house%>%group_by(ZIP5)%>%
+  mutate(average = mean(r2))%>%
+  mutate(val_bld_zip5 = r2/average)
+
+house <- house%>%group_by(ZIP3)%>%
+  mutate(average = mean(r2))%>%
+  mutate(val_bld_zip3 = r2/average)
+
+house <- house%>%group_by(TAXCLASS)%>%
+  mutate(average = mean(r2))%>%
+  mutate(val_bld_taxclass = r2/average)
+
+house <- house%>%group_by(B)%>%
+  mutate(average = mean(r2))%>%
+  mutate(val_bld_borough = r2/average)
+
+house <- house%>%
+  mutate(val_bld_all = r2/mean(r2))
+
+
+```
+
+r3 related
+```{r}
+house <- house%>%group_by(ZIP5)%>%
+  mutate(average = mean(r3))%>%
+  mutate(val_store_zip5 = r3/average)
+
+house <- house%>%group_by(ZIP3)%>%
+  mutate(average = mean(r3))%>%
+  mutate(val_store_zip3 = r3/average)
+
+house <- house%>%group_by(TAXCLASS)%>%
+  mutate(average = mean(r3))%>%
+  mutate(val_store_taxclass = r3/average)
+
+house <- house%>%group_by(B)%>%
+  mutate(average = mean(r3))%>%
+  mutate(val_store_borough = r3/average)
+
+house <- house%>%
+  mutate(val_store_all = r3/mean(r3))
+
+```
+
+r4 related
+```{r}
+house <- house%>%group_by(ZIP5)%>%
+  mutate(average = mean(r4))%>%
+  mutate(land_ltf_zip5 = r4/average)
+
+house <- house%>%group_by(ZIP3)%>%
+  mutate(average = mean(r4))%>%
+  mutate(land_ltf_zip3 = r4/average)
+
+house <- house%>%group_by(TAXCLASS)%>%
+  mutate(average = mean(r4))%>%
+  mutate(land_ltf_taxclass = r4/average)
+
+house <- house%>%group_by(B)%>%
+  mutate(average = mean(r4))%>%
+  mutate(land_ltf_borough = r4/average)
+
+house <- house%>%
+  mutate(land_ltf_all = r4/mean(r4))
+
+```
+
+r5 related
+```{r}
+house <- house%>%group_by(ZIP5)%>%
+  mutate(average = mean(r5))%>%
+  mutate(land_bld_zip5 = r5/average)
+
+house <- house%>%group_by(ZIP3)%>%
+  mutate(average = mean(r5))%>%
+  mutate(land_bld_zip3 = r5/average)
+
+house <- house%>%group_by(TAXCLASS)%>%
+  mutate(average = mean(r5))%>%
+  mutate(land_bld_taxclass = r5/average)
+
+house <- house%>%group_by(B)%>%
+  mutate(average = mean(r5))%>%
+  mutate(land_bld_borough = r5/average)
+
+house <- house%>%
+  mutate(land_bld_all = r5/mean(r5))
+
+```
+
+
+r6 related
+```{r}
+house <- house%>%group_by(ZIP5)%>%
+  mutate(average = mean(r6))%>%
+  mutate(land_store_zip5 = r6/average)
+
+house <- house%>%group_by(ZIP3)%>%
+  mutate(average = mean(r6))%>%
+  mutate(land_store_zip3 = r6/average)
+
+house <- house%>%group_by(TAXCLASS)%>%
+  mutate(average = mean(r6))%>%
+  mutate(land_store_taxclass = r6/average)
+
+house <- house%>%group_by(B)%>%
+  mutate(average = mean(r6))%>%
+  mutate(land_store_borough = r6/average)
+
+house <- house%>%
+  mutate(land_store_all = r6/mean(r6))
+
+```
+
+r7 related
+```{r}
+house <- house%>%group_by(ZIP5)%>%
+  mutate(average = mean(r7))%>%
+  mutate(tol_lft_zip5 = r7/average)
+
+house <- house%>%group_by(ZIP3)%>%
+  mutate(average = mean(r7))%>%
+  mutate(tol_lft_zip3 = r7/average)
+
+house <- house%>%group_by(TAXCLASS)%>%
+  mutate(average = mean(r7))%>%
+  mutate(tol_lft_taxclass = r7/average)
+
+house <- house%>%group_by(B)%>%
+  mutate(average = mean(r7))%>%
+  mutate(tol_lft_borough = r7/average)
+
+house <- house%>%
+  mutate(tol_lft_all = r7/mean(r7))
+
+```
+
+r8 related
+```{r}
+house <- house%>%group_by(ZIP5)%>%
+  mutate(average = mean(r8))%>%
+  mutate(tol_bld_zip5 = r8/average)
+
+house <- house%>%group_by(ZIP3)%>%
+  mutate(average = mean(r8))%>%
+  mutate(tol_bld_zip3 = r8/average)
+
+house <- house%>%group_by(TAXCLASS)%>%
+  mutate(average = mean(r8))%>%
+  mutate(tol_bld_taxclass = r8/average)
+
+house <- house%>%group_by(B)%>%
+  mutate(average = mean(r8))%>%
+  mutate(tol_bld_borough = r8/average)
+
+house <- house%>%
+  mutate(tol_bld_all = r8/mean(r8))
+
+```
+
+r9 related
+```{r}
+house <- house%>%group_by(ZIP5)%>%
+  mutate(average = mean(r9))%>%
+  mutate(tol_store_zip5 = r9/average)
+
+house <- house%>%group_by(ZIP3)%>%
+  mutate(average = mean(r9))%>%
+  mutate(tol_store_zip3 = r9/average)
+
+house <- house%>%group_by(TAXCLASS)%>%
+  mutate(average = mean(r9))%>%
+  mutate(tol_store_taxclass = r9/average)
+
+house <- house%>%group_by(B)%>%
+  mutate(average = mean(r9))%>%
+  mutate(tol_store_borough = r9/average)
+
+house <- house%>%
+  mutate(tol_store_all = r9/mean(r9))
+
+```
+
+```{r}
+house_new_data <- house[,-34:-45]
+write.csv(house_new_data,file = "house_new_data.csv")
+```
+
